@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Local Community Event Portal</title>
+
+  <!-- Internal CSS for welcome banner -->
+  <style>
+    #welcomeBanner {
+      background-color: lightblue;
+      padding: 10px;
+      text-align: center;
+      font-size: 1.5em;
+    }
+    .highlight {
+      font-weight: bold;
+      color: #0057e7;
+    }
+    .galleryImg {
+      border: 3px solid #ccc;
+      width: 150px;
+      height: auto;
+    }
+  </style>
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <a href="#home">Home</a> |
+    <a href="#events">Events</a> |
+    <a href="#contact">Contact</a> |
+    <a href="help.html" target="_blank">Help</a>
+  </nav>
+
+  <!-- Main -->
+  <main>
+    <!-- Home Section -->
+    <section id="home">
+      <div id="welcomeBanner">
+        Welcome, Resident! <span style="color: red; font-weight: bold;">Special Offer: 50% off Spring Festival</span>
+      </div>
+      <p class="highlight">Discover events, register online, and stay connected with your community.</p>
+    </section>
+
+    <!-- Events Section -->
+    <section id="events">
+      <h2>Past Event Highlights</h2>
+      <table>
+        <caption>Community Memories</caption>
+        <tr>
+          <td><img src="event1.jpg" alt="Spring Fair" title="Spring Fair" class="galleryImg"></td>
+          <td><img src="event2.jpg" alt="Music Night" title="Music Night" class="galleryImg"></td>
+          <td><img src="event3.jpg" alt="Food Fest" title="Food Fest" class="galleryImg"></td>
+        </tr>
+        <tr>
+          <td><img src="event4.jpg" alt="Art Expo" title="Art Expo" class="galleryImg"></td>
+          <td><img src="event5.jpg" alt="Book Fair" title="Book Fair" class="galleryImg"></td>
+          <td><img src="event6.jpg" alt="Summer Camp" title="Summer Camp" class="galleryImg" ondblclick="this.style.width='300px'"></td>
+        </tr>
+      </table>
+
+      <h2>Register for an Event</h2>
+      <form id="eventForm" onsubmit="showOutput(); return false;">
+        <input type="text" name="name" placeholder="Your Name" required autofocus>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="date" name="date" required>
+        <select name="eventType" id="eventType" onchange="storePreference(); showFee()">
+          <option value="">Choose Event</option>
+          <option value="music">Music Night ($10)</option>
+          <option value="art">Art Expo ($5)</option>
+          <option value="food">Food Fest ($15)</option>
+        </select>
+        <p>Fee: <span id="feeDisplay">$0</span></p>
+        <input type="tel" name="phone" placeholder="Phone" onblur="validatePhone(this)">
+        <textarea placeholder="Message" onkeyup="countChars(this)"></textarea>
+        <p>Characters: <span id="charCount">0</span></p>
+        <button type="submit" onclick="showOutput()">Submit</button>
+        <output id="confirmation"></output>
+      </form>
+      <button onclick="clearPreferences()">Clear Preferences</button>
+
+      <h2>Event Invite Video</h2>
+      <video controls width="300" oncanplay="videoReadyMsg()">
+        <source src="promo.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <p id="videoStatus"></p>
+
+      <h2>Find Nearby Events</h2>
+      <button onclick="getLocation()">Find Nearby Events</button>
+      <p id="locationDisplay"></p>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+      <h2>Contact Us</h2>
+      <p>Email: contact@communityevents.org</p>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Local Community Portal</p>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    function validatePhone(input) {
+      const regex = /^[0-9]{10}$/;
+      if (!regex.test(input.value)) alert("Enter a valid 10-digit phone number.");
+    }
+
+    function showFee() {
+      const val = document.getElementById("eventType").value;
+      const feeMap = { music: "$10", art: "$5", food: "$15" };
+      document.getElementById("feeDisplay").textContent = feeMap[val] || "$0";
+    }
+
+    function countChars(textarea) {
+      document.getElementById("charCount").textContent = textarea.value.length;
+    }
+
+    function showOutput() {
+      document.getElementById("confirmation").textContent = "Registration submitted successfully!";
+    }
+
+    function videoReadyMsg() {
+      document.getElementById("videoStatus").textContent = "Video ready to play.";
+    }
+
+    function storePreference() {
+      const type = document.getElementById("eventType").value;
+      localStorage.setItem("preferredEvent", type);
+    }
+
+    function clearPreferences() {
+      localStorage.clear();
+      sessionStorage.clear();
+      alert("Preferences cleared!");
+    }
+
+    function getLocation() {
+      if (!navigator.geolocation) return alert("Geolocation not supported.");
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          const coords = `Latitude: ${pos.coords.latitude}, Longitude: ${pos.coords.longitude}`;
+          document.getElementById("locationDisplay").textContent = coords;
+        },
+        err => {
+          alert("Error fetching location: " + err.message);
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    }
+
+    // Pre-fill event type
+    window.onload = () => {
+      const savedType = localStorage.getItem("preferredEvent");
+      if (savedType) document.getElementById("eventType").value = savedType;
+    };
+
+    window.onbeforeunload = () => {
+      return "You have unsaved changes. Are you sure you want to leave?";
+    };
+  </script>
+</body>
+</html>
